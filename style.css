@@ -22,6 +22,11 @@
   margin: 0;
   -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
   padding: 0;
+  background-image: url(./joce2.png);
+  background-size: 300px;
+  background-repeat: no-repeat;
+  background-position: 50% 10%;
+  width: 300px;
 }
 .btn-53:disabled {
   cursor: default;
