@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quejas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="quejas.css">
+
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+      
+        const supabase = createClient('https://kzbjxzwmiaodygehqhxu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6Ymp4endtaWFvZHlnZWhxaHh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY5MjM1NjksImV4cCI6MjAzMjQ5OTU2OX0.LwEMB4XuxdpUI11HCCH5KzFkJHv0I4H3CKW_nGZ3QEU');
+        const btnSubmit = document.getElementById('submit')
+
+        var quejas = getQuejas()
+
+        btnSubmit.addEventListener('click', (e) => {
+            e.preventDefault()
+            insertQueja()
+        })
+
+
+        async function getQuejas(){
+            try{                
+                let { data: quejas, error } = await supabase
+                .from('joce')
+                .select('*')
+
+                if (error) throw error;
+                quejas.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
+                console.log(quejas)
+                
+                const tableBody = document.getElementById('quejasTableBody');
+                
+                tableBody.innerHTML = '';
+
+                quejas.forEach(queja => {
+                    let row = document.createElement('tr');
+                    let usernameCell = document.createElement('td');
+                    let motivoCell = document.createElement('td');
+                    let createTimeCell = document.createElement('td');
+
+                    usernameCell.textContent = queja.username;
+                    motivoCell.textContent = queja.motivo;
+                    createTimeCell.textContent = new Date(queja.create_time).toLocaleDateString();
+
+                    row.appendChild(usernameCell);
+                    row.appendChild(motivoCell);
+                    row.appendChild(createTimeCell);
+
+                    tableBody.appendChild(row);
+                });
+
+            }catch(error){
+                console.log(error);
+            }
+        }
+
+        async function insertQueja(){
+            var username = document.getElementById('username')
+            var motivo = document.getElementById('motivo')
+
+            if (!username || !motivo) {
+                alert("Todos los campos son obligatorios");
+                return;
+            }
+
+            try{                
+                const { data, error } = await supabase
+                .from('joce')
+                .insert
+                ([{ 
+                  username: username.value, 
+                  motivo: motivo.value
+                 },])
+                .select()
+
+                if(error) throw error
+
+                alert("Queja añadida")
+
+                getQuejas()
+                motivo.value = ''
+
+            }catch(error){
+                console.log(error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', getQuejas);
+
+      </script>
+</head>
+<body>
+        <form action="">
+            <input type="text" name="username" id="username" placeholder="username" required>
+            <textarea class="form-control" id="motivo" name="motivo" rows="3" placeholder="Motivo" required></textarea>
+
+            <button type="submit" id="submit" class="btn btn-primary">Enviar</button>
+        </form>
+
+        <table class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Nombre de usuario</th>
+                    <th scope="col">Motivo</th>
+                    <th scope="col">Fecha de creación</th>
+                </tr>
+            </thead>
+            <tbody id="quejasTableBody">
+            </tbody>
+        </table>
+</body>
+</html>
