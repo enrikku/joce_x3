@@ -62,7 +62,7 @@
             var username = document.getElementById('username')
             var motivo = document.getElementById('motivo')
 
-            if (!username || !motivo) {
+            if (username.value == "" || motivo.value == "") {
                 alert("Todos los campos son obligatorios");
                 return;
             }
